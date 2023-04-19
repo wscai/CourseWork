@@ -83,7 +83,7 @@ def non_max_suppression(R, border_width=3, threshold=0.01):
     index = np.argwhere(Final_mark > 0)
     return index
 
-
+#%%
 # Parameters, add more if needed
 sigma = 2
 thresh = 0.01
@@ -92,8 +92,6 @@ k = 0.04
 dx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
 dy = dx.transpose()
 image_dir = 'Harris-1.jpg'
-# %%
-
 # Read from image
 bw = cv2.imread(image_dir)
 # Change the color scheme to grayscale
@@ -109,20 +107,24 @@ g = fspecial((max(1, np.floor(3 * sigma) * 2 + 1), max(1, np.floor(3 * sigma) * 
 Iy2 = conv2(np.power(Iy, 2), g)
 Ix2 = conv2(np.power(Ix, 2), g)
 Ixy = conv2(Ix * Iy, g)
-
+# image read for inbuilt function
+img_inbuilt = np.float32(cv2.cvtColor(cv2.imread(image_dir), cv2.COLOR_BGR2GRAY))
 # compute Harris cornerness
 R = HarrisCornerness(Ix2, Ixy, Iy2)
+R_inbuilt = cv2.cornerHarris(img_inbuilt, 13, 3, 0.04)
 Final_index = non_max_suppression(R)
+Final_index_inbuilt = non_max_suppression(R_inbuilt)
 # Read the image to visualize corners detected
 Final_image = cv2.cvtColor(cv2.imread(image_dir), cv2.COLOR_BGR2RGB)
+
+Final_image_inbuilt = cv2.cvtColor(cv2.imread(image_dir), cv2.COLOR_BGR2RGB)
 # Draw red circles to indicate corners
 for i in Final_index:
     cv2.circle(Final_image, (i[1], i[0]), 5, (255, 0, 0), -1)
+for i in Final_index_inbuilt:
+    cv2.circle(Final_image_inbuilt, (i[1], i[0]), 5, (255, 0, 0), -1)
 # show image with corners
 plt.imshow(Final_image)
 plt.show()
-
-img = cv2.imread(image_dir)
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-gray = np.float32(gray)
-inbuilt_harris = cv2.cornerHarris(gray, 13, 3, 0.04)
+plt.imshow(Final_image_inbuilt)
+plt.show()
