@@ -6,6 +6,7 @@ Your name (Your uniID):
 
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
 
 
 def conv2(img, conv_filter):
@@ -38,39 +39,6 @@ def fspecial(shape=(3, 3), sigma=0.5):
     return h
 
 
-# Parameters, add more if needed
-sigma = 2
-thresh = 0.01
-
-# Derivative masks
-dx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
-dy = dx.transpose()
-import matplotlib.pyplot as plt
-
-# %%
-image_dir = 'Harris-1.jpg'
-# Read from image
-bw = cv2.imread(image_dir)
-# Change the color scheme to grayscale
-bw = cv2.cvtColor(bw, cv2.COLOR_BGR2GRAY)
-# Change the range of the image from float in [0, 1] to integer in [0, 255]
-bw = np.array(bw * 255, dtype=int)
-# Compute x and y derivatives of image
-Ix = conv2(bw, dx)
-Iy = conv2(bw, dy)
-# Obtain gaussian window
-g = fspecial((max(1, np.floor(3 * sigma) * 2 + 1), max(1, np.floor(3 * sigma) * 2 + 1)), sigma)
-# Perform convolution on Ix, Iy to get wIx^2, wIy^2, wIxIy
-Iy2 = conv2(np.power(Iy, 2), g)
-Ix2 = conv2(np.power(Ix, 2), g)
-Ixy = conv2(Ix * Iy, g)
-
-
-# %%
-######################################################################
-# Task: Compute the Harris Cornerness
-######################################################################
-# Compute Harris Cornerness
 def HarrisCornerness(Ix2, Ixy, Iy2, k=0.04):
     # Initialize a zero matrix with shape [image shape]x2x2 to store M.
     M = np.zeros((Ix2.shape[0], Ix2.shape[1], 2, 2))
@@ -88,14 +56,7 @@ def HarrisCornerness(Ix2, Ixy, Iy2, k=0.04):
     return R
 
 
-######################################################################
-# Task: Perform non-maximum suppression and
-#       thresholding, return the N corner points
-#       as an Nx2 matrix of x and y coordinates
-######################################################################
-
-
-def non_max_suppression(R,border_width=3,threshold=0.01):
+def non_max_suppression(R, border_width=3, threshold=0.01):
     # pad R with border width, replicate edge values to border
     R_border = cv2.copyMakeBorder(R, border_width, border_width, border_width, border_width, cv2.BORDER_REPLICATE)
     # corner values after suppression
@@ -105,8 +66,9 @@ def non_max_suppression(R,border_width=3,threshold=0.01):
         # Iterate through the matrix (column)
         for j in range(border_width, R_border.shape[1] - border_width):
             # if the center point is not the maximum in the square matrix with 2*width + 1 length around it
-            if np.max(R_border[i - border_width:i + border_width + 1, j - border_width:j + border_width + 1]) != R_border[
-                    i, j]:
+            if np.max(R_border[i - border_width:i + border_width + 1, j - border_width:j + border_width + 1]) != \
+                    R_border[
+                        i, j]:
                 # supress the point
                 R_star[i, j] = 0
     # Adjust the threshold according to the values in R_star
@@ -122,6 +84,32 @@ def non_max_suppression(R,border_width=3,threshold=0.01):
     return index
 
 
+# Parameters, add more if needed
+sigma = 2
+thresh = 0.01
+k = 0.04
+# Derivative masks
+dx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
+dy = dx.transpose()
+image_dir = 'Harris-1.jpg'
+# %%
+
+# Read from image
+bw = cv2.imread(image_dir)
+# Change the color scheme to grayscale
+bw = cv2.cvtColor(bw, cv2.COLOR_BGR2GRAY)
+# Change the range of the image from float in [0, 1] to integer in [0, 255]
+bw = np.array(bw * 255, dtype=int)
+# Compute x and y derivatives of image
+Ix = conv2(bw, dx)
+Iy = conv2(bw, dy)
+# Obtain gaussian window
+g = fspecial((max(1, np.floor(3 * sigma) * 2 + 1), max(1, np.floor(3 * sigma) * 2 + 1)), sigma)
+# Perform convolution on Ix, Iy to get wIx^2, wIy^2, wIxIy
+Iy2 = conv2(np.power(Iy, 2), g)
+Ix2 = conv2(np.power(Ix, 2), g)
+Ixy = conv2(Ix * Iy, g)
+
 # compute Harris cornerness
 R = HarrisCornerness(Ix2, Ixy, Iy2)
 Final_index = non_max_suppression(R)
@@ -129,7 +117,12 @@ Final_index = non_max_suppression(R)
 Final_image = cv2.cvtColor(cv2.imread(image_dir), cv2.COLOR_BGR2RGB)
 # Draw red circles to indicate corners
 for i in Final_index:
-    cv2.circle(Final_image,(i[1],i[0]),5,(255,0,0),-1)
+    cv2.circle(Final_image, (i[1], i[0]), 5, (255, 0, 0), -1)
 # show image with corners
 plt.imshow(Final_image)
 plt.show()
+
+img = cv2.imread(image_dir)
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+gray = np.float32(gray)
+inbuilt_harris = cv2.cornerHarris(gray, 13, 3, 0.04)
