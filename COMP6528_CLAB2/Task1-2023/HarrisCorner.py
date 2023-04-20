@@ -93,8 +93,6 @@ def HarrisCornerness(Ix2, Ixy, Iy2, k=0.04):
 #       thresholding, return the N corner points
 #       as an Nx2 matrix of x and y coordinates
 ######################################################################
-
-
 def non_max_suppression(R,border_width=3,threshold=0.01):
     # pad R with border width, replicate edge values to border
     R_border = cv2.copyMakeBorder(R, border_width, border_width, border_width, border_width, cv2.BORDER_REPLICATE)
@@ -120,7 +118,6 @@ def non_max_suppression(R,border_width=3,threshold=0.01):
     # Index of corners
     index = np.argwhere(Final_mark > 0)
     return index
-
 
 # compute Harris cornerness
 R = HarrisCornerness(Ix2, Ixy, Iy2)

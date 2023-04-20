@@ -16,7 +16,7 @@ def conv2(img, conv_filter):
     conv_filter = conv_filter[range(f_siz_1 - 1, -1, -1), :][:, range(f_siz_1 - 1, -1, -1)]
     pad = (conv_filter.shape[0] - 1) // 2
     result = np.zeros(img.shape)
-    img = np.pad(img, ((pad, pad), (pad, pad)), 'constant', constant_values=(0, 0))
+    img = np.pad(img, ((pad, pad), (pad, pad)), 'edge')
     filter_size = conv_filter.shape[0]
     for r in np.arange(img.shape[0] - filter_size + 1):
         for c in np.arange(img.shape[1] - filter_size + 1):
@@ -101,8 +101,10 @@ bw = np.array(bw * 255, dtype=int)
 # Compute x and y derivatives of image
 Ix = conv2(bw, dx)
 Iy = conv2(bw, dy)
-# Obtain gaussian window
+
+# Obtain gaussian window with size of 3 sigma + 1 (covers 99.7% of the bell shaped distribution)
 g = fspecial((max(1, np.floor(3 * sigma) * 2 + 1), max(1, np.floor(3 * sigma) * 2 + 1)), sigma)
+
 # Perform convolution on Ix, Iy to get wIx^2, wIy^2, wIxIy
 Iy2 = conv2(np.power(Iy, 2), g)
 Ix2 = conv2(np.power(Ix, 2), g)
