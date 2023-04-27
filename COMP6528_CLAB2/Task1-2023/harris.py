@@ -56,7 +56,7 @@ def HarrisCornerness(Ix2, Ixy, Iy2, k=0.04):
     return R
 
 
-def non_max_suppression(R, border_width=3, threshold=0.01):
+def non_max_suppression(R, border_width=1, threshold=0.01):
     # pad R with border width, replicate edge values to border
     R_border = cv2.copyMakeBorder(R, border_width, border_width, border_width, border_width, cv2.BORDER_REPLICATE)
     # corner values after suppression
@@ -91,7 +91,7 @@ k = 0.04
 # Derivative masks
 dx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
 dy = dx.transpose()
-image_dir = 'Harris-1.jpg'
+image_dir = 'Harris-5.jpg'
 # Read from image
 bw = cv2.imread(image_dir)
 # Change the color scheme to grayscale
@@ -127,6 +127,8 @@ for i in Final_index_inbuilt:
     cv2.circle(Final_image_inbuilt, (i[1], i[0]), 5, (255, 0, 0), -1)
 # show image with corners
 plt.imshow(Final_image)
+plt.title(f'Harris Corners for {image_dir}')
 plt.show()
 plt.imshow(Final_image_inbuilt)
+plt.title(f'Inbuilt Harris Corners for {image_dir}')
 plt.show()
