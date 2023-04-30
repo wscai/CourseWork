@@ -1,7 +1,7 @@
 # %%
 """
 CLAB Task-1: Harris Corner Detector
-Your name (Your uniID):
+Your name (Your uniID): Wangshu Cai (u7546753)
 """
 
 import numpy as np
@@ -56,7 +56,7 @@ def HarrisCornerness(Ix2, Ixy, Iy2, k=0.04):
     return R
 
 
-def non_max_suppression(R, border_width=1, threshold=0.01):
+def non_max_suppression(R, border_width=5, threshold=0.01):
     # pad R with border width, replicate edge values to border
     R_border = cv2.copyMakeBorder(R, border_width, border_width, border_width, border_width, cv2.BORDER_REPLICATE)
     # corner values after suppression
@@ -74,7 +74,7 @@ def non_max_suppression(R, border_width=1, threshold=0.01):
     # Adjust the threshold according to the values in R_star
     Threshold = np.max(R_star) * threshold
     # Initialize a boolean matrix with False (0)
-    Final_mark = np.zeros(bw.shape)
+    Final_mark = np.zeros(R.shape)
     # Set the value to True (1) if the suppressed cornerness value is greater than threshold
     Final_mark += R_star[border_width:-border_width, border_width:-border_width] > Threshold
     # Set the datatype to Boolean
@@ -84,47 +84,57 @@ def non_max_suppression(R, border_width=1, threshold=0.01):
     return index
 
 #%%
-# Parameters, add more if needed
+# Parameters
 sigma = 2
 thresh = 0.01
 k = 0.04
+image_dir = 'Harris-6.jpg'
+circle_size = 2
 # Derivative masks
 dx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
 dy = dx.transpose()
-image_dir = 'Harris-5.jpg'
-# Read from image
-bw = cv2.imread(image_dir)
-# Change the color scheme to grayscale
-bw = cv2.cvtColor(bw, cv2.COLOR_BGR2GRAY)
-# Change the range of the image from float in [0, 1] to integer in [0, 255]
-bw = np.array(bw * 255, dtype=int)
-# Compute x and y derivatives of image
-Ix = conv2(bw, dx)
-Iy = conv2(bw, dy)
 
-# Obtain gaussian window with size of 3 sigma + 1 (covers 99.7% of the bell shaped distribution)
-g = fspecial((max(1, np.floor(3 * sigma) * 2 + 1), max(1, np.floor(3 * sigma) * 2 + 1)), sigma)
 
-# Perform convolution on Ix, Iy to get wIx^2, wIy^2, wIxIy
-Iy2 = conv2(np.power(Iy, 2), g)
-Ix2 = conv2(np.power(Ix, 2), g)
-Ixy = conv2(Ix * Iy, g)
-# image read for inbuilt function
-img_inbuilt = np.float32(cv2.cvtColor(cv2.imread(image_dir), cv2.COLOR_BGR2GRAY))
-# compute Harris cornerness
-R = HarrisCornerness(Ix2, Ixy, Iy2)
-R_inbuilt = cv2.cornerHarris(img_inbuilt, 13, 3, 0.04)
-Final_index = non_max_suppression(R)
-Final_index_inbuilt = non_max_suppression(R_inbuilt)
-# Read the image to visualize corners detected
+
+# Returns two arrays containing the index of dectected corners of my function and inbuilt function
+def compute_harris(image_dir, sigma, thresh, k):
+    # Read from image
+    bw = cv2.imread(image_dir)
+    # Change the color scheme to grayscale
+    bw = cv2.cvtColor(bw, cv2.COLOR_BGR2GRAY)
+    # Change the range of the image from float in [0, 1] to integer in [0, 255]
+    bw = np.array(bw * 255, dtype=int)
+    # Compute x and y derivatives of image
+    Ix = conv2(bw, dx)
+    Iy = conv2(bw, dy)
+
+    # Obtain gaussian window with size of 3 sigma + 1 (covers 99.7% of the bell shaped distribution)
+    g = fspecial((max(1, np.floor(3 * sigma) * 2 + 1), max(1, np.floor(3 * sigma) * 2 + 1)), sigma)
+
+    # Perform convolution on Ix, Iy to get wIx^2, wIy^2, wIxIy
+    Iy2 = conv2(np.power(Iy, 2), g)
+    Ix2 = conv2(np.power(Ix, 2), g)
+    Ixy = conv2(Ix * Iy, g)
+    # image read for inbuilt function
+    img_inbuilt = np.float32(cv2.cvtColor(cv2.imread(image_dir), cv2.COLOR_BGR2GRAY))
+    # compute Harris cornerness
+    R = HarrisCornerness(Ix2, Ixy, Iy2)
+    R_inbuilt = cv2.cornerHarris(img_inbuilt, 13, 3, k)
+    final_index = non_max_suppression(R,3,threshold=thresh)
+    final_index_inbuilt = non_max_suppression(R_inbuilt,3,threshold=thresh)
+    return final_index, final_index_inbuilt
+
+
+
+Final_index, Final_index_inbuilt = compute_harris(image_dir,sigma,thresh,k)
 Final_image = cv2.cvtColor(cv2.imread(image_dir), cv2.COLOR_BGR2RGB)
 
 Final_image_inbuilt = cv2.cvtColor(cv2.imread(image_dir), cv2.COLOR_BGR2RGB)
 # Draw red circles to indicate corners
 for i in Final_index:
-    cv2.circle(Final_image, (i[1], i[0]), 5, (255, 0, 0), -1)
+    cv2.circle(Final_image, (i[1], i[0]), circle_size, (255, 0, 0), -1)
 for i in Final_index_inbuilt:
-    cv2.circle(Final_image_inbuilt, (i[1], i[0]), 5, (255, 0, 0), -1)
+    cv2.circle(Final_image_inbuilt, (i[1], i[0]), circle_size, (255, 0, 0), -1)
 # show image with corners
 plt.imshow(Final_image)
 plt.title(f'Harris Corners for {image_dir}')

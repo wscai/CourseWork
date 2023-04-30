@@ -48,7 +48,7 @@ dy = dx.transpose()
 import matplotlib.pyplot as plt
 
 # %%
-image_dir = 'Harris-1.jpg'
+image_dir = 'Harris-5.jpg'
 # Read from image
 bw = cv2.imread(image_dir)
 # Change the color scheme to grayscale
@@ -121,6 +121,8 @@ def non_max_suppression(R,border_width=3,threshold=0.01):
 
 # compute Harris cornerness
 R = HarrisCornerness(Ix2, Ixy, Iy2)
+plt.imshow(R)
+plt.show()
 Final_index = non_max_suppression(R)
 # Read the image to visualize corners detected
 Final_image = cv2.cvtColor(cv2.imread(image_dir), cv2.COLOR_BGR2RGB)
