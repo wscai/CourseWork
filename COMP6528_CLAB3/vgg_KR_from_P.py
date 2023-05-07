@@ -39,15 +39,33 @@ def vgg_KR_from_P(P, noscale = True):
     if noscale:
         K = K / K[N-1,N-1]
         if K[0,0] < 0:
-            D = np.diag([-1, -1, np.ones([1,N-2])]);
+            D = np.diag([-1, -1, np.ones([1,N-2])])
             K = K @ D
             R = D @ R
         
-            test = K*R; 
+            test = K*R
             assert (test/test[0,0] - H/H[0,0]).all() <= 1e-07
     
     t = np.linalg.inv(-P[:,0:N]) @ P[:,-1]
     return K, R, t
 
-K, R, t = vgg_KR_from_P(C)
-print()
+K, R, t = vgg_KR_from_P(V)
+print(K,R,t)
+K_inv = np.linalg.inv(K)
+
+# Compute the matrix product M = K^-1[R|t]
+M = np.matmul(K_inv, np.hstack((R, t.reshape(-1,1))))
+
+# Calculate the singular value decomposition (SVD) of M
+U, S, Vt = np.linalg.svd(M)
+
+# Extract the focal length f from the third singular value of M
+f = 1/S[2]
+
+R_inv = np.linalg.inv(R)
+
+# Compute the camera center coordinate C in world coordinates
+C = R_inv @ (-t)
+
+# Print the camera center coordinate
+print("Camera center coordinate:", C)
