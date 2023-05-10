@@ -1,0 +1,8 @@
+matplotlib==3.6.3
+jupyter==1.0.0
+scipy>=1.9.1
+scikit-learn>=1.0.2
+opencv-python>=4.7.0.72
+networkx>=2.8.4
+recordclass==0.18.3
+tqdm
