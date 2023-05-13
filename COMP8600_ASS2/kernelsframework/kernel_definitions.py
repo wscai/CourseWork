@@ -42,9 +42,11 @@ def compute_wl_features(graphs: List[nx.Graph], h: int) -> np.array:
       l[node] = injection_f(str(graph.degree(node)))
     # update features
     for k in range(h):
+      ll = copy.deepcopy(l)
       for node in graph.nodes:
         key = f'{l[node]} {sorted([l[m] for m in graph.neighbors(node)])}'
-        l[node] = injection_f(key)
+        ll[node] = injection_f(key)
+      l=ll
     L.append(l)
     final_labels.update(l.values())
   final_labels = list(final_labels)

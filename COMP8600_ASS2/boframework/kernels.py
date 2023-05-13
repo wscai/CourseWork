@@ -135,13 +135,33 @@ class Matern:
         # TODO Q2.2b
         # Uncomment the code and implement the Matern class covariance functions for different values of nu
         # FIXME
-        # if self.nu == :
-        #     pass
-        # elif self.nu == :
-        #     pass
-        # ...
-        # else:
-        #     # Do not change
-        #     raise NotImplementedError
+        n_samples_X = X.shape[0]
+        n_samples_Y = Y.shape[0]
+        if n_samples_Y == 0:
+            n_samples_Y = n_samples_X
+            Y = X
 
-        raise NotImplementedError
+        K = np.zeros((n_samples_X, n_samples_Y))
+        if self.nu == 3 / 2:
+            for i in range(n_samples_X):
+                for j in range(n_samples_Y):
+                    d = np.linalg.norm(X[i] - Y[j])
+                    K[i][j] = self.variance * np.exp(-np.sqrt(3) * d / length_scale) * (
+                                np.sqrt(3) * d / length_scale + 1)
+            return K
+        elif self.nu == 5 / 2:
+            for i in range(n_samples_X):
+                for j in range(n_samples_Y):
+                    d = np.linalg.norm(X[i] - Y[j])
+                    K[i][j] = self.variance * np.exp(-np.sqrt(5) * d / length_scale) * (
+                            5 / 3 * d ** 2 / (length_scale ** 2) + np.sqrt(5) * d / length_scale + 1)
+            return K
+        else:
+            # Do not change
+            # for i in range(n_samples_X):
+            #     for j in range(n_samples_Y):
+            #         d = np.linalg.norm(X[i] - Y[j])
+            #         K[i][j] = self.variance * np.exp(d ** 2 / (2 * length_scale ** 2))
+            # return K
+
+            raise NotImplementedError
