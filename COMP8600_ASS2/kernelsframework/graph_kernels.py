@@ -15,7 +15,8 @@ from kernel_definitions import compute_wl_features
 warnings.filterwarnings("ignore")
 
 
-DATASETS = ["MUTAG", "DD", "NCI1", "NCI109", "EXP"]
+# DATASETS = ["MUTAG", "DD", "NCI1", "NCI109", "EXP"]
+DATASETS = ["MUTAG", "NCI1", "NCI109"]
 
 def get_graphs(dataset: str) -> Tuple[List[nx.Graph], List[int]]:
   """ Return list of networkx graphs and corresponding labels for input dataset """
