@@ -7,6 +7,7 @@ import selenium
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 import time
@@ -18,4 +19,6 @@ driver = webdriver.Chrome()
 driver.get("https://gibber.cc/playground/index.html")
 # get the html text
 html =driver.page_source
-driver.execute_script("document.getElementsByClassName('cm-variable')[0].innerHTML='f3ffff'")
+action = ActionChains(driver)
+driver.find_element(By.CLASS_NAME, "cm-variable").click()
+action.key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.ENTER).key_up(Keys.SHIFT).perform()
