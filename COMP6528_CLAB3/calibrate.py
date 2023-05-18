@@ -23,11 +23,10 @@ coordinate_2D = np.array(
      (261.79085726246126, 422.9789247590476), (357.09141242487374, 455.70260936300843)]
 )
 #visualization
-plt.plot(coordinate_2D[:,0],coordinate_2D[:,1],'b*')
-plt.title(f'chosen uv coordinates on image {image_name}')
-plt.imshow(I)
-plt.show()
-
+# plt.plot(coordinate_2D[:,0],coordinate_2D[:,1],'b*')
+# plt.title(f'chosen uv coordinates on image {image_name}')
+# plt.imshow(I)
+# plt.show()
 
 coordinate_3D = np.array(
     [[0, 21,7],[0,21,21],
@@ -135,12 +134,49 @@ def calibrate(im, XYZ, uv):
 
 ############################################################################
 #%%
-image_name = 'Left.jpg'
-I2 = plt.imread(image_name)
+image_name_left = 'Left.jpg'
+image_name_right = 'Right.jpg'
+
+I_l = plt.imread(image_name_left)
+I_r = plt.imread(image_name_right)
+
+
 # Graphical user interface to get 6 points
-plt.imshow(I2)
-uv = plt.ginput(6)
-print(uv)
+# plt.imshow(I_l)
+# uv = plt.ginput(6)
+# print(uv)
+
+coordinate_left = np.array([
+    (152.5676062234005, 108.5259241909281), (186.49530553866703, 111.10737957361141),
+    (228.9049296827501, 112.21371759476136), (290.1223001863831, 114.05761429667803),
+    (158.83685500991714, 184.49446830989427), (194.23967168671697, 192.97639313871088),
+    (236.64929583080004, 202.93343532906084), (286.06572744216646, 213.62803620017743),
+    (175.43192532716705, 172.69352941762767), (233.33028176735002, 183.3881302887443),
+    (175.80070466755035, 151.30432767539446), (233.69906110773343, 158.31113514267776)
+
+])
+coordinate_right = np.array([
+    (169.1626765406504, 147.9853136119445), (222.26690155585015, 146.87897559079448),
+    (275.0023472306665, 146.87897559079448), (339.5387317977494, 146.87897559079448),
+    (181.3323947733004, 217.31582960401073), (232.96150242696672, 218.0533882847774),
+    (285.69694810178305, 216.9470502636274), (338.0636144362161, 216.9470502636274),
+    (207.14694860013356, 203.30221466944417), (282.74671337871644, 203.30221466944417),
+    (207.51572794051685, 183.75690962912762), (282.37793403833314, 183.01935094836094)
+])
+
+#
+# I_l = plt.imread(image_name_left)
+# plt.plot(coordinate_left[:,0],coordinate_left[:,1],'b*')
+# plt.title(f'chosen uv coordinates on image {image_name_left}')
+# plt.imshow(I_l)
+# plt.show()
+#
+# I_r = plt.imread(image_name_right)
+# plt.plot(coordinate_right[:,0],coordinate_right[:,1],'b*')
+# plt.title(f'chosen uv coordinates on image {image_name_left}')
+# plt.imshow(I_r)
+# plt.show()
+
 def homography(u2Trans, v2Trans, uBase, vBase):
     H = None
     return H 
