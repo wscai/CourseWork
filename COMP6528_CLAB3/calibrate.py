@@ -5,7 +5,8 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 import cv2
-#
+
+#%%
 image_name = 'stereo2012a.jpg'
 I = plt.imread(image_name)
 # Graphical user interface to get 6 points
@@ -96,19 +97,8 @@ def calibrate(im, XYZ, uv):
     plt.show()
     return p
 
-
-p = calibrate(I,coordinate_3D,coordinate_2D)
-# TBD
-# T_norm = np.array(
-#     [
-#         [im.shape[1]+im.shape[0],0,im.shape[1]/2],
-#         [0,im.shape[1]+im.shape[0],im.shape[0]/2],
-#         [0,0,1]
-#      ]
-# )
-# S_norm = np.array(
-#     []
-# )
+#
+# p = calibrate(I,coordinate_3D,coordinate_2D)
 '''
 %% TASK 1: CALIBRATE
 %
@@ -144,6 +134,13 @@ p = calibrate(I,coordinate_3D,coordinate_2D)
 '''
 
 ############################################################################
+#%%
+image_name = 'Left.jpg'
+I2 = plt.imread(image_name)
+# Graphical user interface to get 6 points
+plt.imshow(I2)
+uv = plt.ginput(6)
+print(uv)
 def homography(u2Trans, v2Trans, uBase, vBase):
     H = None
     return H 
