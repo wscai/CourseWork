@@ -4,7 +4,6 @@
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-import cv2
 
 #%%
 image_name = 'stereo2012a.jpg'
@@ -41,6 +40,10 @@ coordinate_3D = np.array(
 def calibrate(im, XYZ, uv):
     # copy the image
     im = im[:]
+    # plot on the image
+    plt.imshow(im)
+    # add blue star on the image according to uv
+    plt.plot(uv[:, 0], uv[:, 1], 'bo')
     # Initialize A
     A = np.zeros((2*len(XYZ),12))
     # Iteratively calculate values in A for each pair of point
@@ -57,6 +60,7 @@ def calibrate(im, XYZ, uv):
     _,_,p = np.linalg.svd(A)
     p = (p[-1] / np.linalg.norm(p[-1])).reshape(3,4)
     mse = 0
+    predicted_coordinate = np.zeros(uv.shape)
     # Verification
     for i in range(len(XYZ)):
         # generate homogeneous point coordinate
@@ -65,10 +69,13 @@ def calibrate(im, XYZ, uv):
         new_uv = np.matmul(p,new_XYZ)
         # scaling
         new_uv = new_uv[:2]/new_uv[2]
-        # draw circle for visualization
-        cv2.circle(im,(int(new_uv[0]),int(new_uv[1])),3,(255,0,0),-1)
+        predicted_coordinate[i,0] = new_uv[0]
+        predicted_coordinate[i,1] = new_uv[1]
         # accumulate mse
         mse+=np.linalg.norm(uv[i]-new_uv)
+    # plot predicted coordinate with red circle
+    mse/=uv.shape[0]
+    plt.plot(uv[:, 0], uv[:, 1], 'r+')
     print(f'The means square error between the chosen uv coordinates and the '+
           f'corresponding projected points is: {mse/len(XYZ)}')
     # calculate origin in 2d image
@@ -77,27 +84,26 @@ def calibrate(im, XYZ, uv):
     # x axis
     x = np.matmul(p,np.array([40,0,0,1]))
     x = tuple((x[:2]/x[2]).astype(int))
-    cv2.line(im, origin, x, (0, 255, 0), thickness=3, lineType=8)
+    plt.plot([origin[0],x[0]], [origin[1],x[1]], 'go-')
     # y axis
     y = np.matmul(p,np.array([0,40,0,1]))
     y = tuple((y[:2]/y[2]).astype(int))
-    cv2.line(im, origin, y, (0, 255, 0), thickness=3, lineType=8)
+    plt.plot([origin[0],y[0]], [origin[1],y[1]], 'go-')
     # z axis
     z = np.matmul(p,np.array([0,0,40,1]))
     z = tuple((z[:2]/z[2]).astype(int))
     # draw line for visualization
-    cv2.line(im, origin, z, (0, 255, 0), thickness=3, lineType=8)
+    plt.plot([origin[0],z[0]], [origin[1],z[1]], 'go-')
     # draw origin for visualization
-    cv2.circle(im,(int(origin[0]),int(origin[1])),3,(0,255,0),-1)
+    plt.plot(origin[0], origin[1], 'ko')
 
     # show annotated image
-    plt.imshow(im)
     plt.title('Visualization of calibration')
     plt.show()
     return p
 
 #
-# p = calibrate(I,coordinate_3D,coordinate_2D)
+p = calibrate(I,coordinate_3D,coordinate_2D)
 '''
 %% TASK 1: CALIBRATE
 %
@@ -149,19 +155,12 @@ I_r = plt.imread(image_name_right)
 coordinate_left = np.array([
     (152.5676062234005, 108.5259241909281), (186.49530553866703, 111.10737957361141),
     (228.9049296827501, 112.21371759476136), (290.1223001863831, 114.05761429667803),
-    (158.83685500991714, 184.49446830989427), (194.23967168671697, 192.97639313871088),
-    (236.64929583080004, 202.93343532906084), (286.06572744216646, 213.62803620017743),
-    (175.43192532716705, 172.69352941762767), (233.33028176735002, 183.3881302887443),
-    (175.80070466755035, 151.30432767539446), (233.69906110773343, 158.31113514267776)
-
+    (158.83685500991714, 184.49446830989427), (194.23967168671697, 192.97639313871088)
 ])
 coordinate_right = np.array([
     (169.1626765406504, 147.9853136119445), (222.26690155585015, 146.87897559079448),
     (275.0023472306665, 146.87897559079448), (339.5387317977494, 146.87897559079448),
-    (181.3323947733004, 217.31582960401073), (232.96150242696672, 218.0533882847774),
-    (285.69694810178305, 216.9470502636274), (338.0636144362161, 216.9470502636274),
-    (207.14694860013356, 203.30221466944417), (282.74671337871644, 203.30221466944417),
-    (207.51572794051685, 183.75690962912762), (282.37793403833314, 183.01935094836094)
+    (181.3323947733004, 217.31582960401073), (232.96150242696672, 218.0533882847774)
 ])
 
 #
