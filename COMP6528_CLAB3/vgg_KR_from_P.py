@@ -49,23 +49,24 @@ def vgg_KR_from_P(P, noscale = True):
     t = np.linalg.inv(-P[:,0:N]) @ P[:,-1]
     return K, R, t
 
-K, R, t = vgg_KR_from_P(V)
-print(K,R,t)
-K_inv = np.linalg.inv(K)
-
-# Compute the matrix product M = K^-1[R|t]
-M = np.matmul(K_inv, np.hstack((R, t.reshape(-1,1))))
-
-# Calculate the singular value decomposition (SVD) of M
-U, S, Vt = np.linalg.svd(M)
-
-# Extract the focal length f from the third singular value of M
-f = 1/S[2]
-
-R_inv = np.linalg.inv(R)
-
-# Compute the camera center coordinate C in world coordinates
-C = R_inv @ (-t)
-
-# Print the camera center coordinate
-print("Camera center coordinate:", C)
+#
+# K, R, t = vgg_KR_from_P(p)
+# print(K,R,t)
+# K_inv = np.linalg.inv(K)
+#
+# # Compute the matrix product M = K^-1[R|t]
+# M = np.matmul(K_inv, np.hstack((R, t.reshape(-1,1))))
+#
+# # Calculate the singular value decomposition (SVD) of M
+# U, S, Vt = np.linalg.svd(M)
+#
+# # Extract the focal length f from the third singular value of M
+# f = 1/S[2]
+#
+# R_inv = np.linalg.inv(R)
+#
+# # Compute the camera center coordinate C in world coordinates
+# C = R_inv @ (-t)
+#
+# # Print the camera center coordinate
+# print("Camera center coordinate:", C)
