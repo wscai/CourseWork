@@ -39,8 +39,19 @@ coordinate_3D = np.array(
      ]
 )
 
+def calculate_intersection(v1, v2, u1, u2):
+    x_diff = (v1[0] - v2[0], u1[0] - u2[0])
+    y_diff = (v1[1] - v2[1], u1[1] - u2[1])
+    intersection_x = (v1[0] * v2[1] - v1[1] * v2[0]) * (u1[0] - u2[0]) - \
+                     (v1[0] - v2[0]) * (u1[0] * u2[1] - u1[1] * u2[0])
+    intersection_x /= (x_diff[0] * y_diff[1] - x_diff[1] * y_diff[0])
 
+    intersection_y = (v1[0] * v2[1] - v1[1] * v2[0]) * (u1[1] - u2[1]) - \
+                     (v1[1] - v2[1]) * (u1[0] * u2[1] - u1[1] * u2[0])
+    intersection_y /= (x_diff[0] * y_diff[1] - x_diff[1] * y_diff[0])
+    return np.array([int(intersection_x), int(intersection_y)])
 #####################################################################
+plotting_vanishing_point = False
 def calibrate(im, XYZ, uv):
     # copy the image
     im = im[:]
@@ -86,18 +97,39 @@ def calibrate(im, XYZ, uv):
     origin = np.matmul(p, np.array([0, 0, 0, 1]))
     origin = tuple((origin[:2] / origin[2]).astype(int))
     # x axis
-    x = np.matmul(p, np.array([40, 0, 0, 1]))
-    x = tuple((x[:2] / x[2]).astype(int))
-    plt.plot([origin[0], x[0]], [origin[1], x[1]], 'go-')
+    # x = np.matmul(p, np.array([40, 0, 0, 1]))
+    if plotting_vanishing_point:
+        x_1 = np.matmul(p, np.array([0, 1, 0, 1]))[:2]/np.matmul(p, np.array([0, 1, 0, 1]))[2]
+        x_2 = np.matmul(p, np.array([0, 2, 0, 1]))[:2]/np.matmul(p, np.array([0, 2, 0, 1]))[2]
+        x_3 = np.matmul(p, np.array([1, 1, 0, 1]))[:2]/np.matmul(p, np.array([1, 1, 0, 1]))[2]
+        x_4 = np.matmul(p, np.array([1, 2, 0, 1]))[:2]/np.matmul(p, np.array([1, 2, 0, 1]))[2]
+        x = calculate_intersection(x_1, x_3, x_2, x_4)
+        plt.plot([origin[0], x[0]], [origin[1], x[1]], 'go-')
+    else:
+        x = np.matmul(p, np.array([40, 0, 0, 1]))[:2]/np.matmul(p, np.array([40, 0, 0, 1]))[2]
+        plt.plot([origin[0], x[0]], [origin[1], x[1]], 'g,-')
     # y axis
-    y = np.matmul(p, np.array([0, 40, 0, 1]))
-    y = tuple((y[:2] / y[2]).astype(int))
-    plt.plot([origin[0], y[0]], [origin[1], y[1]], 'go-')
+    if plotting_vanishing_point:
+        y_1 = np.matmul(p, np.array([1, 0, 0, 1]))[:2]/np.matmul(p, np.array([1, 0, 0, 1]))[2]
+        y_2 = np.matmul(p, np.array([2, 0, 0, 1]))[:2]/np.matmul(p, np.array([2, 0, 0, 1]))[2]
+        y_3 = np.matmul(p, np.array([1, 1, 0, 1]))[:2]/np.matmul(p, np.array([1, 1, 0, 1]))[2]
+        y_4 = np.matmul(p, np.array([2, 1, 0, 1]))[:2]/np.matmul(p, np.array([2, 1, 0, 1]))[2]
+        y = calculate_intersection(y_1, y_3, y_2, y_4)
+        plt.plot([origin[0], y[0]], [origin[1], y[1]], 'go-')
+    else:
+        y = np.matmul(p, np.array([0, 40, 0, 1]))[:2]/np.matmul(p, np.array([0, 40, 0, 1]))[2]
+        plt.plot([origin[0], y[0]], [origin[1], y[1]], 'g,-')
     # z axis
-    z = np.matmul(p, np.array([0, 0, 40, 1]))
-    z = tuple((z[:2] / z[2]).astype(int))
-    # draw line for visualization
-    plt.plot([origin[0], z[0]], [origin[1], z[1]], 'go-')
+    if plotting_vanishing_point:
+        z_1 = np.matmul(p, np.array([0, 0, 1, 1]))[:2]/np.matmul(p, np.array([0, 0, 1, 1]))[2]
+        z_2 = np.matmul(p, np.array([0, 1, 1, 1]))[:2]/np.matmul(p, np.array([0, 1, 1, 1]))[2]
+        z_3 = np.matmul(p, np.array([0, 0, 2, 1]))[:2]/np.matmul(p, np.array([0, 0, 2, 1]))[2]
+        z_4 = np.matmul(p, np.array([0, 1, 2, 1]))[:2]/np.matmul(p, np.array([0, 1, 2, 1]))[2]
+        z = calculate_intersection(z_1, z_3, z_2, z_4)
+        plt.plot([origin[0], z[0]], [origin[1], z[1]], 'go-')
+    else:
+        z = np.matmul(p, np.array([0, 0, 40, 1]))[:2]/np.matmul(p, np.array([0, 0, 40, 1]))[2]
+        plt.plot([origin[0], z[0]], [origin[1], z[1]], 'g,-')
     # draw origin for visualization
     plt.plot(origin[0], origin[1], 'ko')
 
@@ -120,6 +152,8 @@ def get_camera_center(R,t):
 
 def get_pitch_angle(R):
     return -math.asin(R[2,0])
+
+
 #
 p = calibrate(I, coordinate_3D, coordinate_2D)
 K,R,t = vgg_KR_from_P(p)
@@ -127,6 +161,7 @@ t = -R@t
 focal_length = get_focal_length(K)
 camera_center = get_camera_center(R,t)
 pitch_angle = get_pitch_angle(R)
+
 #%% 1.6
 # resize image
 width = int(I.shape[1] / 3)
@@ -139,7 +174,7 @@ plt.title(f'resized image {image_name}')
 plt.show()
 
 uv_resize = coordinate_2D/3
-XYZ_resize = coordinate_3D/3
+XYZ_resize = coordinate_3D
 
 p_resize = calibrate(I_resize, XYZ_resize, uv_resize)
 K_resize, R_resize, t_resize = vgg_KR_from_P(p_resize)
