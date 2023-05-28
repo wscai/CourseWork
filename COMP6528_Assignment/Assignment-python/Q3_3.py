@@ -109,10 +109,12 @@ def display_results(ax, f, im_results, threshold_results, overall_result):
 
 def non_maximum_suppression(gxy, gx, gy):
     ans = np.zeros(gxy.shape)
-    for y in range(1, gxy.shape[0] - 1):
-        for x in range(1, gxy.shape[1] - 1):
+    for i in range(gxy.shape[0] - 2):
+        for j in range(gxy.shape[1] - 2):
+            y = i + 1
+            x = j + 1
             # if no gradient then continue
-            if gxy[y, x] == 0:
+            if gx[y, x] == 0 and gy[y, x] == 0:
                 continue
             # if the gradient is close to y direction
             elif np.abs(gx[y, x]) <= np.abs(gy[y, x]):

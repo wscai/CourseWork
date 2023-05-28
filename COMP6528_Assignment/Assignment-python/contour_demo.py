@@ -9,7 +9,7 @@ from skimage.io import imread
 from pybsds.bsds_dataset import BSDSDataset
 from pybsds import evaluate_boundaries
 import matplotlib
-
+from helper_function import *
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
@@ -34,7 +34,6 @@ def compute_edges_dxdy(I):
     mag = np.clip(mag, 0, 255)
     mag = mag.astype(np.uint8)
     return mag
-
 
 def detect_edges(imlist, fn, out_dir):
     for imname in tqdm(imlist):
@@ -90,8 +89,8 @@ def display_results(ax, f, im_results, threshold_results, overall_result):
 if __name__ == '__main__':
     imset = 'val'
     imlist = get_imlist(imset)
-    output_dir = 'contour-output/demo';
-    fn = compute_edges_dxdy;
+    output_dir = 'contour-output/demo'
+    fn = compute_edges_dxdy
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
