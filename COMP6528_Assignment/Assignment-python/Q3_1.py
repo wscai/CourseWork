@@ -9,6 +9,7 @@ from skimage.io import imread
 from pybsds.bsds_dataset import BSDSDataset
 from pybsds import evaluate_boundaries
 import matplotlib
+from helper_function import *
 
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
@@ -26,8 +27,8 @@ def get_imlist(name):
 def compute_edges_dxdy(I):
     """Returns the norm of dx and dy as the edge response function."""
     I = I.astype(np.float32) / 255.
-    dx = signal.convolve2d(I, np.array([[-1, 0, 1]]), mode='same')
-    dy = signal.convolve2d(I, np.array([[-1, 0, 1]]).T, mode='same')
+    dx = signal.convolve2d(I, np.array([[-1, 0, 1]]), mode='same', boundary='symm')
+    dy = signal.convolve2d(I, np.array([[-1, 0, 1]]).T, mode='same', boundary='symm')
     mag = np.sqrt(dx ** 2 + dy ** 2)
     mag = mag / np.max(mag)
     mag = mag * 255.
@@ -36,6 +37,7 @@ def compute_edges_dxdy(I):
     return mag
 
 
+@timing
 def detect_edges(imlist, fn, out_dir):
     for imname in tqdm(imlist):
         I = cv2.imread(os.path.join(IMAGE_DIR, str(imname) + '.jpg'))
@@ -90,8 +92,8 @@ def display_results(ax, f, im_results, threshold_results, overall_result):
 if __name__ == '__main__':
     imset = 'val'
     imlist = get_imlist(imset)
-    output_dir = 'contour-output/demo';
-    fn = compute_edges_dxdy;
+    output_dir = 'contour-output/3-1'
+    fn = compute_edges_dxdy
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
