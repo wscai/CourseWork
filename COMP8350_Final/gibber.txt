@@ -33,6 +33,15 @@ pad.chord.seq([[0,2,4,6], [1,2,4,7]], 4 )
 
 r = Reverb().bus()
 
+Gibber.clear()
+
+s2 = Synth('square.perc.long').connect()
+mod2 = gen( cycle( beats(4)*2 )* 2 )
+mod2.connect( s2.frequency )
+s2.note.seq( [0,2,4,5], 1/2 )
+
+s2.note.seq( [0,2,4,5], 1/2 )
+
 
 bass = Synth( 'bass.hollow' ).connect(r,2)
   .note.seq( [0,7], 1 )
@@ -62,3 +71,5 @@ glitch.pickplay.seq(
   Rndi(0,14)/* 9 */,
   Euclid(9,16)/* 1011010101101010 */ 
 )
+
+Pluck().note.seq( [0,2,4,5], 1/2 )
